@@ -1,0 +1,31 @@
+# DevOps Day 2
+
+## Topics Covered
+
+### Git
+
+* Working Directory
+* Staging Area
+* Commit
+* Git commands
+* Git Merge
+* Git Rebase
+* Git Stash
+
+### Architecture & Infrastructure
+
+* Virtualization
+* Containerization
+* Monolithic Architecture
+* Microservices Architecture
+
+### Docker
+
+* Docker Registry
+* Docker Architecture
+* Docker Components
+* Basic Docker Commands
+
+## Hands-on Practice
+
+Practiced Git workflows and basic Docker commands to understand how version control and containerization are used in DevOps.
