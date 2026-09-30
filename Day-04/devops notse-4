@@ -1,0 +1,23 @@
+# DevOps Day 04 – Docker Networking, Volumes & Compose
+
+This folder contains my Day 04 DevOps learning notes and hands-on practice with Docker.
+
+## Topics Covered
+
+- Docker Networks
+- Docker Network Commands
+- Docker Volumes
+- Types of Docker Volumes
+- Bind Mount
+- Volume Mount
+- tmpfs Mount
+- Docker Compose
+- YAML configuration
+- Managing multiple containers with Docker Compose
+
+## Docker Networks
+
+### List Docker Networks
+
+```bash
+docker network ls
