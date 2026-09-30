@@ -1,0 +1,31 @@
+# DevOps Day 03 – Docker
+
+This folder contains my Day 03 DevOps learning notes and hands-on practice with Docker.
+
+## Topics Covered
+
+- Docker container management
+- Running and stopping containers
+- Docker container naming
+- Interactive containers
+- Docker port mapping
+- Apache web server using Docker
+- Docker images
+- Container image backup and restore
+- Dockerfile
+- Dockerfile instructions
+- Docker networks
+
+## Docker Commands Practiced
+
+### Container Management
+
+```bash
+docker ps
+docker ps -a
+
+docker start <container-name>
+docker stop <container-name>
+
+docker rm <container-name>
+docker rm -f <container-name>
