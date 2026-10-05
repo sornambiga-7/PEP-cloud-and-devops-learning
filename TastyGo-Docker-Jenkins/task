@@ -1,0 +1,81 @@
+# TastyGo - Docker & Jenkins CI/CD
+
+A DevOps practice project based on my TastyGo web application.
+
+## Project Overview
+
+This project demonstrates how I containerized a React/Vite application using Docker and integrated it with Jenkins for a basic CI/CD pipeline.
+
+### What I implemented
+
+- Containerized the TastyGo application using Docker
+- Created a multi-stage Dockerfile
+- Used Nginx to serve the production build
+- Built and tested the Docker image locally
+- Created a Jenkins Pipeline
+- Connected Jenkins with GitHub
+- Automated Docker image building and container deployment
+
+## Technologies Used
+
+- Git & GitHub
+- Docker
+- Dockerfile
+- Jenkins
+- Jenkins Pipeline
+- Nginx
+- Node.js
+- React
+- Vite
+
+## CI/CD Workflow
+
+```text
+GitHub
+   ↓
+Jenkins
+   ↓
+Checkout Code
+   ↓
+Build Docker Image
+   ↓
+Stop Old Container
+   ↓
+Run New Container
+   ↓
+TastyGo Application
+
+Docker
+Build Docker Image
+docker build -t tastygo:latest .
+Run Docker Container
+docker run -d --name tastygo-app -p 8083:80 tastygo:latest
+Check Container
+docker ps
+Local Application
+http://localhost:8083
+Jenkins Pipeline
+
+The Jenkins pipeline performs the following stages:
+
+Checkout source code from GitHub
+Build the Docker image
+Stop the existing TastyGo container
+Remove the old container
+Start a new TastyGo container
+Project Screenshots
+
+Screenshots documenting the Docker and Jenkins setup will be added to this repository.
+
+What I Learned
+Docker images and containers
+Multi-stage Docker builds
+Docker port mapping
+Nginx for serving React applications
+Git and GitHub workflow
+Jenkins Pipeline basics
+GitHub and Jenkins integration
+Basic CI/CD workflow
+Learning Context
+
+This project was developed as part of my PEP Cloud / DevOps learning journey.
