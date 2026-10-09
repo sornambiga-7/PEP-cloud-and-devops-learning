@@ -1,0 +1,263 @@
+# TastyGo — DevOps Deployment Project
+
+A hands-on DevOps project demonstrating application containerization, CI pipeline automation, container image publishing, and AWS infrastructure provisioning using Terraform.
+
+TastyGo is a food delivery frontend that I containerized using Docker, integrated with Jenkins, and deployed on two AWS EC2 instances using an image published to GitHub Container Registry (GHCR).
+
+## Project Overview
+
+This project demonstrates how application code moves from GitHub through a Jenkins pipeline, becomes a Docker image, and is published to GHCR for deployment on AWS EC2 instances.
+
+The AWS infrastructure is provisioned using Terraform, while Docker is installed automatically on both instances using EC2 user data.
+
+**Deployment approach:** Jenkins automates image building and publishing. Pulling the image and running the container on EC2 are manual steps in the current implementation.
+
+## Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| React + Vite | Frontend application |
+| Git | Version control |
+| GitHub | Source code repository |
+| Docker | Application containerization |
+| Jenkins | CI pipeline |
+| GitHub Container Registry (GHCR) | Docker image storage |
+| Terraform | Infrastructure as Code |
+| AWS VPC | Network isolation |
+| AWS EC2 | Application hosting |
+| Ubuntu | EC2 operating system |
+
+## Architecture
+
+![TastyGo DevOps Architecture](docs/architecture.png)
+
+### Deployment Workflow
+
+1. Develop and maintain the TastyGo application in GitHub.
+2. Jenkins checks out the source code.
+3. Jenkins builds the Docker image using the Dockerfile.
+4. Jenkins authenticates with GHCR using credentials stored in Jenkins.
+5. Jenkins pushes the image to GHCR.
+6. Terraform provisions the AWS networking resources and two EC2 instances.
+7. EC2 user data installs and starts Docker on both instances.
+8. Connect to each EC2 instance through SSH.
+9. Authenticate with GHCR and pull the published image.
+10. Run the Docker container on each instance.
+11. Access the deployed application through a browser.
+
+## AWS Infrastructure
+
+The infrastructure is provisioned in the AWS Mumbai Region.
+
+| Resource | Configuration |
+|---|---|
+| AWS Region | `ap-south-1` |
+| VPC CIDR | `11.0.0.0/16` |
+| Public Subnet 1 | `11.0.1.0/24` |
+| Public Subnet 2 | `11.0.2.0/24` |
+| Availability Zone 1 | `ap-south-1a` |
+| Availability Zone 2 | `ap-south-1b` |
+| Internet Gateway | Configured |
+| Public Route Table | Configured |
+| Security Group | SSH and application access |
+| EC2 Instances | 2 |
+| Operating System | Ubuntu |
+| Application Host Port | `8080` |
+| Container Port | `80` |
+
+Both EC2 instances are placed in public subnets in different Availability Zones. Each instance runs its own TastyGo container.
+
+## Docker Configuration
+
+The Dockerfile uses a multi-stage build:
+
+1. Uses Node.js to install dependencies and build the frontend.
+2. Copies the generated frontend files into an Nginx image to serve the application.
+
+### Build the Image
+
+```bash
+docker build -t tastygo:latest .
+```
+
+### Run the Container Locally
+
+```bash
+docker run -d --name tastygo-app -p 8080:80 tastygo:latest
+```
+
+Open the application:
+
+```text
+http://localhost:8080
+```
+
+### Verify the Container
+
+```bash
+docker ps
+```
+
+## Jenkins CI Pipeline
+
+The Jenkins pipeline is configured to retrieve the project from GitHub and publish the Docker image to GHCR.
+
+### Pipeline Stages
+
+1. **Checkout:** Retrieves the source code from GitHub.
+2. **Build Docker Image:** Builds the image using the Dockerfile.
+3. **Login to GHCR:** Authenticates using Jenkins credentials.
+4. **Push to GHCR:** Publishes the image to the container registry.
+
+### Published Image
+
+```text
+ghcr.io/sornambiga-7/tastygo:latest
+```
+
+Jenkins credentials are used to avoid hardcoding the registry token in the pipeline.
+
+## Terraform Infrastructure Provisioning
+
+Terraform is used to define and provision the AWS infrastructure as code.
+
+The configuration is organized into separate files:
+
+| File | Responsibility |
+|---|---|
+| `provider.tf` | AWS provider configuration |
+| `vpc.tf` | VPC creation |
+| `subnet.tf` | Public subnet creation |
+| `internet_gateway.tf` | Internet Gateway |
+| `route_table.tf` | Public routing and subnet associations |
+| `security_group.tf` | EC2 network access rules |
+| `ec2.tf` | EC2 instances and Docker installation |
+| `outputs.tf` | EC2 public IP outputs |
+
+### Terraform Commands
+
+Initialize the working directory:
+
+```bash
+terraform init
+```
+
+Validate the configuration:
+
+```bash
+terraform validate
+```
+
+Preview the proposed infrastructure changes:
+
+```bash
+terraform plan
+```
+
+Create or update the infrastructure:
+
+```bash
+terraform apply
+```
+
+Display the EC2 public IP addresses:
+
+```bash
+terraform output
+```
+
+When the infrastructure is no longer needed, remove the Terraform-managed resources:
+
+```bash
+terraform destroy
+```
+
+**Important:** Review the plan before applying changes. Destroying the infrastructure will remove the Terraform-managed resources.
+
+## Deploying the Image on EC2
+
+The current deployment process uses manual commands after Jenkins publishes the image.
+
+### 1. Connect to an EC2 Instance
+
+From a terminal that has access to the EC2 private key:
+
+```bash
+ssh -i "terraform-key.pem" ubuntu@<EC2_PUBLIC_IP>
+```
+
+### 2. Authenticate with GHCR
+
+```bash
+sudo docker login ghcr.io
+```
+
+Enter the GitHub username and a suitable Personal Access Token when prompted. The token must have permission to read the private package.
+
+### 3. Pull the Published Image
+
+```bash
+sudo docker pull ghcr.io/sornambiga-7/tastygo:latest
+```
+
+### 4. Run the Application Container
+
+```bash
+sudo docker run -d --name tastygo-app -p 8080:80 ghcr.io/sornambiga-7/tastygo:latest
+```
+
+### 5. Verify the Deployment
+
+```bash
+sudo docker ps
+```
+
+Repeat the deployment steps on the second EC2 instance.
+
+The application is available through:
+
+```text
+http://<EC2_PUBLIC_IP>:8080
+```
+
+Replace `<EC2_PUBLIC_IP>` with the public IPv4 address of the instance. The security group must allow inbound traffic on port `8080`.
+
+## Security Considerations
+
+- Never commit AWS credentials, GitHub tokens, or private SSH keys.
+- Store GHCR credentials in Jenkins Credentials.
+- Use a token with only the permissions required for the operation.
+- Restrict SSH access to trusted IP addresses rather than allowing unrestricted access.
+- Review security group rules before deployment.
+- Avoid exposing unnecessary application or management ports.
+- Protect private container images and registry credentials.
+
+## Project Results
+
+- [x] Containerized the TastyGo frontend using Docker.
+- [x] Built the Docker image successfully.
+- [x] Configured a Jenkins pipeline connected to GitHub.
+- [x] Published the Docker image to GHCR.
+- [x] Provisioned AWS infrastructure using Terraform.
+- [x] Created two EC2 instances in different Availability Zones.
+- [x] Installed Docker automatically using EC2 user data.
+- [x] Pulled the published image onto both EC2 instances.
+- [x] Ran the application container on both instances.
+- [x] Verified application access through a browser.
+
+## Future Improvements
+
+- Automate EC2 deployment from Jenkins.
+- Add automated application testing to the pipeline.
+- Implement a more restrictive SSH access policy.
+- Add monitoring and centralized logging.
+- Introduce HTTPS using a domain and TLS certificate.
+- Explore a load balancer to distribute traffic between the EC2 instances.
+
+## Author
+
+**Sornambiga**
+
+GitHub: [sornambiga-7](https://github.com/sornambiga-7)
+
+Repository: [TastyGo](https://github.com/sornambiga-7/TastyGo)
